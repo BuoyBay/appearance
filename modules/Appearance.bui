@@ -1,0 +1,100 @@
+#If TargetMac Then
+    Private Declare Function NativeClass Lib "objc" Alias "objc_getClass" (name As String) As Ptr
+    Private Declare Function NativeSelector Lib "objc" Alias "sel_registerName" (name As String) As Ptr
+    Private Declare Function NativeWorkspace Lib "AppKit" Selector "sharedWorkspace" (cls As Ptr) As Ptr
+    Private Declare Function Responds Lib "Foundation" Selector "respondsToSelector:" (object As Ptr, action As Ptr) As UInt8
+    Private Declare Function ReadBoolean Lib "objc" Alias "objc_msgSend" (object As Ptr, action As Ptr) As UInt8
+
+    Private Function ReadPreference(workspace As Ptr, name As String) As Boolean
+        Dim action As Ptr = NativeSelector(name)
+        If Responds(workspace, action) = 0 Then Return False
+        Return ReadBoolean(workspace, action) <> 0
+    End Function
+#End If
+
+''' Read-only snapshot; Refresh explicitly updates it after OS settings change.
+Public Class AppearanceSnapshot
+    Private Property mDarkMode As Boolean = False
+    Public Property DarkMode As Boolean
+        Get
+            Return Me.mDarkMode
+        End Get
+    End Property
+    Private Property mAccessibilityAvailable As Boolean = False
+    Public Property AccessibilityAvailable As Boolean
+        Get
+            Return Me.mAccessibilityAvailable
+        End Get
+    End Property
+    Private Property mReduceMotion As Boolean = False
+    Public Property ReduceMotion As Boolean
+        Get
+            Return Me.mReduceMotion
+        End Get
+    End Property
+    Private Property mReduceTransparency As Boolean = False
+    Public Property ReduceTransparency As Boolean
+        Get
+            Return Me.mReduceTransparency
+        End Get
+    End Property
+    Private Property mIncreaseContrast As Boolean = False
+    Public Property IncreaseContrast As Boolean
+        Get
+            Return Me.mIncreaseContrast
+        End Get
+    End Property
+    Private Property mDifferentiateWithoutColor As Boolean = False
+    Public Property DifferentiateWithoutColor As Boolean
+        Get
+            Return Me.mDifferentiateWithoutColor
+        End Get
+    End Property
+    Private Property mInvertColors As Boolean = False
+    Public Property InvertColors As Boolean
+        Get
+            Return Me.mInvertColors
+        End Get
+    End Property
+    Private Property mVoiceOver As Boolean = False
+    Public Property VoiceOver As Boolean
+        Get
+            Return Me.mVoiceOver
+        End Get
+    End Property
+
+    Public Sub Constructor()
+        Me.Refresh()
+    End Sub
+    Public Sub Refresh()
+        Me.mDarkMode = System.IsDarkMode
+        Me.mAccessibilityAvailable = False
+        Me.mReduceMotion = False
+        Me.mReduceTransparency = False
+        Me.mIncreaseContrast = False
+        Me.mDifferentiateWithoutColor = False
+        Me.mInvertColors = False
+        Me.mVoiceOver = False
+        #If TargetMac Then
+            Dim workspace As Ptr = NativeWorkspace(NativeClass("NSWorkspace"))
+            Me.mAccessibilityAvailable = workspace <> Nil
+            If workspace <> Nil Then
+                Me.mReduceMotion = ReadPreference(workspace, "accessibilityDisplayShouldReduceMotion")
+                Me.mReduceTransparency = ReadPreference(workspace, "accessibilityDisplayShouldReduceTransparency")
+                Me.mIncreaseContrast = ReadPreference(workspace, "accessibilityDisplayShouldIncreaseContrast")
+                Me.mDifferentiateWithoutColor = ReadPreference(workspace, "accessibilityDisplayShouldDifferentiateWithoutColor")
+                Me.mInvertColors = ReadPreference(workspace, "accessibilityDisplayShouldInvertColors")
+                Me.mVoiceOver = ReadPreference(workspace, "isVoiceOverEnabled")
+            End If
+        #End If
+    End Sub
+    Public Function ColorScheme() As String
+        If Me.DarkMode Then Return "dark"
+        Return "light"
+    End Function
+    Public Function AnimationDuration(preferredSeconds As Double) As Double
+        If preferredSeconds < 0.0 Then Throw New InvalidArgumentException("Animation duration must be nonnegative")
+        If Me.ReduceMotion Then Return 0.0
+        Return preferredSeconds
+    End Function
+End Class

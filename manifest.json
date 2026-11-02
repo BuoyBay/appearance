@@ -2,7 +2,7 @@
     "schema": 1,
     "name": "appearance",
     "version": "0.1.0",
-    "description": "OS appearance and accessibility snapshot (dark mode, Reduce Motion, \u2026)",
+    "description": "Dark mode and accessibility snapshot",
     "platforms": [
         "arm64-apple-macos",
         "x86_64-apple-macos",

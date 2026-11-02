@@ -1,4 +1,4 @@
-# OS appearance and accessibility snapshot (dark mode, Reduce Motion, …)
+# Dark mode and accessibility snapshot
 
 `Import appearance` exposes `AppearanceSnapshot`, a read-only OS sampling helper
 whose returned properties can also be copied/customized as a view-policy model.

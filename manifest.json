@@ -2,7 +2,7 @@
   "schema": 1,
   "name": "appearance",
   "version": "0.1.0",
-  "description": "Read-only system appearance and accessibility snapshots",
+  "description": "Read system appearance and accessibility preferences",
   "platforms": [
     "arm64-apple-macos",
     "x86_64-apple-macos",

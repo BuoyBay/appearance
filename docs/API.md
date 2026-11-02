@@ -22,7 +22,4 @@ explicit snapshot refresh, not an observer. Refresh on application activation or
 when handling OS appearance notifications. UI apps should sample on the main thread.
 
 [Apple's accessibility display preferences](https://developer.apple.com/documentation/appkit/nsworkspace/accessibilitydisplayshouldreducemotion)
-describe the native settings and their intended effect. Tests query the live system
-without changing it and verify the reduced-motion policy helper.
-
-Maintainers run the private validation suite before release. See the repository README for public build instructions.
+describe the native settings and their intended effect.
